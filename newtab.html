@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark light">
+    <title>MintList</title>
+    <script src="quick-theme.js"></script>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="app-shell" id="appShell">
+      <aside class="sidebar" id="sidebar">
+        <button class="sidebar-toggle" id="sidebarToggleButton" type="button" title="Hide sidebar" aria-label="Hide sidebar">
+          <span id="sidebarToggleIcon" aria-hidden="true">&lsaquo;</span>
+        </button>
+
+        <div class="sidebar-content" id="sidebarContent">
+        <div class="brand-row">
+          <div class="brand-mark">
+            <img src="icons/icon128.png" alt="MintList">
+          </div>
+          <div>
+            <h1>MintList</h1>
+            <p>Smart bookmarks, locally yours.</p>
+          </div>
+        </div>
+
+        <section class="account-panel" id="accountPanel">
+          <div>
+            <strong id="accountName">Not signed in</strong>
+            <span id="accountEmail">Google profile required</span>
+          </div>
+          <button class="soft-button" id="signOutButton" type="button">Sign out</button>
+        </section>
+
+        <nav class="page-list" id="pageList" aria-label="Bookmark pages"></nav>
+
+        <button class="soft-button full-width" id="addPageButton" type="button">
+          <span aria-hidden="true">+</span>
+          New page
+        </button>
+
+        <button class="soft-button full-width" id="resetLayoutButton" type="button" title="Arrange boards into a tidy grid">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 3h7v7H3z"></path>
+            <path d="M14 3h7v7h-7z"></path>
+            <path d="M14 14h7v7h-7z"></path>
+            <path d="M3 14h7v7H3z"></path>
+          </svg>
+          Reset layout
+        </button>
+
+        <section class="sidebar-section">
+          <h2>Wallpaper</h2>
+          <div class="segmented-control" aria-label="Wallpaper collection">
+            <button class="segment active" id="darkWallpapersButton" type="button">Dark</button>
+            <button class="segment" id="lightWallpapersButton" type="button">Light</button>
+          </div>
+          <div class="wallpaper-grid" id="wallpaperGrid" aria-label="Wallpaper selection"></div>
+          <label class="soft-button upload-wallpaper">
+            Upload wallpaper
+            <input id="wallpaperUploadInput" type="file" accept="image/*">
+          </label>
+        </section>
+
+        <section class="sidebar-section">
+          <h2>Mode</h2>
+          <label class="toggle-row">
+            <input id="privacyToggle" type="checkbox">
+            <span>Privacy blur</span>
+          </label>
+          <label class="toggle-row">
+            <input id="incognitoToggle" type="checkbox">
+            <span>Open incognito</span>
+          </label>
+        </section>
+        </div>
+      </aside>
+
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <h2 id="pageTitle">Bookmarks</h2>
+          </div>
+          <div class="topbar-actions">
+            <button class="icon-button" id="paletteButton" type="button" title="Search bookmarks (Ctrl/Cmd+K)" aria-label="Search bookmarks">
+              <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </button>
+            <button class="primary-button glass-accent" id="addBoardButton" type="button">
+              <span aria-hidden="true">+</span>
+              Board
+            </button>
+          </div>
+        </header>
+
+        <div class="boards" id="boards" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <dialog class="modal auth-modal" id="authDialog">
+      <form method="dialog" id="authForm" novalidate>
+        <div class="auth-mark">
+          <img src="icons/icon128.png" alt="MintList">
+        </div>
+        <h2>Sign in to MintList</h2>
+        <p>Use your Chrome Google profile to keep this new tab personal on this browser.</p>
+        <p class="status-text" id="authStatus" role="status"></p>
+        <button class="primary-button" id="googleSignInButton" type="button">Sign in with Google</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="linkDialog">
+      <form method="dialog" id="linkForm">
+        <header class="modal-header">
+          <h2 id="linkDialogTitle">Add link</h2>
+          <button class="ghost-button close-link-dialog" value="cancel" formnovalidate type="button" aria-label="Close">x</button>
+        </header>
+        <label>
+          Title
+          <input id="linkTitleInput" required autocomplete="off">
+        </label>
+        <label>
+          URL
+          <input id="linkUrlInput" required type="url" placeholder="https://example.com" autocomplete="off">
+        </label>
+        <footer class="modal-actions">
+          <button class="soft-button close-link-dialog" value="cancel" formnovalidate type="button">Cancel</button>
+          <button class="primary-button" id="saveLinkButton" value="default" type="submit">Save link</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <dialog class="modal palette-modal" id="paletteDialog">
+      <div class="palette-body">
+        <header class="modal-header">
+          <h2>Search bookmarks</h2>
+          <button class="ghost-button" id="closePaletteButton" type="button" aria-label="Close">x</button>
+        </header>
+        <input id="paletteInput" class="palette-input" type="text" placeholder="Search titles or URLs..." autocomplete="off">
+        <div class="palette-results" id="paletteResults"></div>
+        <p class="status-text palette-hint">&uarr;&darr; to navigate &bull; Enter to open &bull; Esc to close</p>
+      </div>
+    </dialog>
+
+    <template id="boardTemplate">
+      <article class="board" draggable="true">
+        <header class="board-header">
+          <input class="board-title-input" aria-label="Board title">
+          <div class="board-actions">
+            <button class="mini-button add-link" type="button" title="Add link">+</button>
+            <button class="mini-button delete-board" type="button" title="Delete board">x</button>
+          </div>
+        </header>
+        <div class="link-list"></div>
+      </article>
+    </template>
+
+    <template id="linkTemplate">
+      <a class="bookmark-link" draggable="true" rel="noreferrer">
+        <span class="favicon"></span>
+        <span class="link-copy">
+          <strong></strong>
+          <small></small>
+        </span>
+        <button class="link-delete" type="button" title="Delete link" aria-label="Delete link">x</button>
+      </a>
+    </template>
+
+    <script src="newtab.js"></script>
+  </body>
+</html>

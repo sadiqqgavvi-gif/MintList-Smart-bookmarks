@@ -1,0 +1,22 @@
+MintList New Tab - Chrome upload steps
+
+Use the ZIP named MintList-New-Tab-Chrome-Upload-1.4.0.zip.
+
+Chrome Web Store:
+1. Open the Chrome Web Store Developer Dashboard.
+2. Click New Item.
+3. Upload MintList-New-Tab-Chrome-Upload-1.4.0.zip.
+4. Fill listing details, screenshots, privacy practices, and permission justifications.
+5. Submit for review.
+
+Local testing:
+1. Open chrome://extensions.
+2. Enable Developer mode.
+3. Click Load unpacked.
+4. Select the unzipped MintList-New-Tab-Chrome-Upload-1.4.0 folder.
+
+Permission notes:
+- bookmarks: imports Chrome bookmarks.
+- storage and unlimitedStorage: saves pages, boards, settings, and uploaded wallpapers locally.
+- tabs: opens links and settings pages.
+- identity and identity.email: reads the signed-in Chrome profile email for the Google profile prompt.
