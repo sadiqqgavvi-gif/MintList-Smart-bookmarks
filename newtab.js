@@ -296,6 +296,9 @@ function renderAccount() {
 }
 
 function maybeShowAuthDialog() {
+  // Outside a real Chrome extension (e.g. this page running as a plain website/demo),
+  // there's no Chrome Google profile to sign into, so don't gate the UI behind it.
+  if (!chromeApi) return;
   if (state.account.signedIn || els.authDialog.open) return;
   els.authStatus.textContent = "";
   els.authDialog.showModal();
