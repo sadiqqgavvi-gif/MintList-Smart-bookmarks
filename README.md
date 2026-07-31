@@ -43,17 +43,17 @@ A freeform, Manifest V3 Chrome extension that replaces your new tab page with a 
 
 ## Screenshots
 
-| Sign In                                                                                                                | Freeform Layout                                                                                                      |
-| ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| ![Sign in](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/01-sign-in.png) | ![Layout](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/02-layout.png) |
+| Sign In                                                                                                                  | Freeform Layout                                                                                                      |
+| ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| ![Sign in](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/01-sign%20in.png) | ![Layout](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/02-layout.png) |
 
-| Upload Wallpaper                                                                                                                         | Search Bookmarks                                                                                                                         |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| ![Upload wallpaper](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/03-upload-wallpaper.png) | ![Search bookmarks](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/04-search-bookmarks.png) |
+| Upload Wallpaper                                                                                                                           | Search Bookmarks                                                                                                                           |
+| ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| ![Upload wallpaper](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/03-upload%20wallpaper.png) | ![Search bookmarks](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/04-search%20bookmarks.png) |
 
-| Add Pages                                                                                                                  |
-| -------------------------------------------------------------------------------------------------------------------------- |
-| ![Add pages](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/05-add-pages.png) |
+| Add Pages                                                                                                                    |
+| ---------------------------------------------------------------------------------------------------------------------------- |
+| ![Add pages](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/05-add%20pages.png) |
 
 ## Project Structure
 
