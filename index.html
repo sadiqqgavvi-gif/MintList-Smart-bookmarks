@@ -64,18 +64,32 @@
             <span>Open incognito</span>
           </label>
         </section>
+
+        <section class="sidebar-section">
+          <h2>Backup</h2>
+          <button class="soft-button full-width" id="exportDataButton" type="button">
+            <span aria-hidden="true">&darr;</span>
+            Export backup
+          </button>
+          <label class="soft-button upload-wallpaper">
+            Import backup
+            <input id="importDataInput" type="file" accept="application/json">
+          </label>
+        </section>
         </div>
       </aside>
 
       <section class="workspace">
         <header class="topbar">
           <div>
-            <p class="eyebrow" id="pageMeta">Personal board</p>
             <h2 id="pageTitle">Bookmarks</h2>
           </div>
           <div class="topbar-actions">
             <button class="icon-button" id="paletteButton" type="button" title="Search bookmarks (Ctrl/Cmd+K)" aria-label="Search bookmarks">🔍</button>
-            <button class="primary-button" id="addBoardButton" type="button">+ Board</button>
+            <button class="primary-button glass-accent" id="addBoardButton" type="button">
+              <span aria-hidden="true">+</span>
+              Board
+            </button>
           </div>
         </header>
 
@@ -135,6 +149,7 @@
         <header class="board-header">
           <input class="board-title-input" aria-label="Board title">
           <div class="board-actions">
+            <button class="mini-button open-board" type="button" title="Open all links">&nearr;</button>
             <button class="mini-button add-link" type="button" title="Add link">+</button>
             <button class="mini-button delete-board" type="button" title="Delete board">x</button>
           </div>

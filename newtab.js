@@ -99,6 +99,8 @@ const els = {
   darkWallpapersButton: document.getElementById("darkWallpapersButton"),
   lightWallpapersButton: document.getElementById("lightWallpapersButton"),
   wallpaperUploadInput: document.getElementById("wallpaperUploadInput"),
+  exportDataButton: document.getElementById("exportDataButton"),
+  importDataInput: document.getElementById("importDataInput"),
   accountPanel: document.getElementById("accountPanel"),
   accountName: document.getElementById("accountName"),
   accountEmail: document.getElementById("accountEmail"),
@@ -376,6 +378,7 @@ function renderBoards() {
     const boardEl = els.boardTemplate.content.firstElementChild.cloneNode(true);
     const titleInput = boardEl.querySelector(".board-title-input");
     const list = boardEl.querySelector(".link-list");
+    const openBoardButton = boardEl.querySelector(".open-board");
     const addLinkButton = boardEl.querySelector(".add-link");
     const deleteBoardButton = boardEl.querySelector(".delete-board");
 
@@ -387,6 +390,14 @@ function renderBoards() {
       board.title = titleInput.value.trim() || "Untitled board";
       await saveState();
       render();
+    });
+
+    openBoardButton.disabled = !board.links.length;
+    openBoardButton.addEventListener("click", async (event) => {
+      event.stopPropagation();
+      for (const link of board.links) {
+        await openBookmark(link.url);
+      }
     });
 
     addLinkButton.addEventListener("click", () => openLinkDialog(board.id));
@@ -850,6 +861,39 @@ function bindEvents() {
     if (!file) return;
     await uploadWallpaper(file);
     els.wallpaperUploadInput.value = "";
+  });
+
+  els.exportDataButton.addEventListener("click", () => {
+    const stamp = new Date().toISOString().slice(0, 10);
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `mintlist-backup-${stamp}.json`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  els.importDataInput.addEventListener("change", async () => {
+    const file = els.importDataInput.files?.[0];
+    if (!file) return;
+    try {
+      const parsed = JSON.parse(await file.text());
+      if (!parsed || !Array.isArray(parsed.pages)) throw new Error("Not a MintList backup");
+      const confirmed = window.confirm("Import this backup? It replaces all current pages, boards, and settings on this device.");
+      if (!confirmed) return;
+      state = parsed;
+      normalizeState();
+      await saveState();
+      render();
+      renderWallpaperChoices();
+    } catch (error) {
+      window.alert("That file doesn't look like a valid MintList backup.");
+    } finally {
+      els.importDataInput.value = "";
+    }
   });
 
   els.googleSignInButton.addEventListener("click", signInWithGoogle);

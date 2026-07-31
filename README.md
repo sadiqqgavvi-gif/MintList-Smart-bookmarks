@@ -24,10 +24,12 @@ A freeform, Manifest V3 Chrome extension that replaces your new tab page with a 
 - **Freeform bookmark boards** — group links into boards you can drag anywhere on an open canvas, not a rigid grid; drag individual links between boards too
 - **Multiple pages** — organize boards across separate named pages, rename any page from the pencil icon or a double-click, and switch between them from the sidebar
 - **Reset layout** — one click snaps every board on the current page back into a tidy grid when the canvas gets messy
+- **Open all links** — one click on a board opens every link in it at once, respecting the incognito toggle
 - **Quick search (Ctrl/Cmd+K)** — a command palette that searches every bookmark's title and URL across every page at once, with arrow-key navigation and Enter to jump straight to a result
 - **Real site favicons** — pulled through Chrome's favicon API, with a generated letter-avatar fallback when a favicon can't load
 - **Theming** — a large built-in dark and light wallpaper collection, or upload your own image; the whole UI (text, panels, accents) re-themes to match automatically
 - **Frosted-glass board styling** — glassmorphism panels with backdrop blur over the active wallpaper
+- **Backup & restore** — export every page, board, link, and setting to a single JSON file, and import it back in (with a confirmation prompt) to restore or move to another machine
 - **Google Chrome profile sign-in** — a lightweight prompt that reads the signed-in Chrome profile's email, no external accounts or servers involved
 - **Privacy blur** — blurs bookmark URLs (revealed on hover) for screen-sharing or presenting
 - **Incognito opening** — optional toggle to open bookmarks in an incognito window
@@ -123,7 +125,6 @@ Two things get shipped from this repo:
 - Optional Chrome bookmarks import
 - Tag- or folder-based board organization
 - Cross-device sync via `chrome.storage.sync`
-- Export/import boards as JSON
 
 ## About This Project
 
