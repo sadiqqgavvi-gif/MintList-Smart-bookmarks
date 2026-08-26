@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "MintList New Tab",
-  "description": "A free smart new-tab bookmark manager with freeform boards, wallpapers, privacy blur, quick search, Google profile sign-in, and incognito opening.",
-  "version": "1.3.0",
+  "description": "A private, polished new-tab bookmark workspace with freeform boards, search, wallpapers, backups, and privacy controls.",
+  "version": "1.4.0",
   "permissions": ["storage", "tabs", "identity", "identity.email", "unlimitedStorage", "favicon"],
   "chrome_url_overrides": {
     "newtab": "index.html"

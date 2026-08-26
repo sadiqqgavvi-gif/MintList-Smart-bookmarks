@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "project": {
+    "name": "MintList-Smart-bookmarks",
+    "productType": null,
+    "stack": []
+  },
+  "sources": {
+    "tokens": [],
+    "components": [],
+    "assets": [],
+    "instructions": []
+  },
+  "design": {
+    "colorMode": "unknown",
+    "colors": {},
+    "typography": {},
+    "spacing": {},
+    "radius": {},
+    "shadows": {},
+    "motion": {},
+    "density": "unknown"
+  },
+  "components": {
+    "installed": [],
+    "preferredPrimitives": [],
+    "patterns": []
+  },
+  "constraints": {
+    "must": [],
+    "avoid": []
+  },
+  "decisions": [
+    "Use a compact command toolbar and restrained frosted surfaces so the visual focus stays on the bookmark workspace.",
+    "Use one local, stroke-based SVG icon set for all interactive controls, with accessible labels and visible focus states.",
+    "Keep wallpaper selection separate from interface appearance so users can choose wallpaper, dark, light, or system-adaptive controls."
+  ],
+  "evidence": [],
+  "generatedAt": "2026-08-26T19:11:23.601Z"
+}

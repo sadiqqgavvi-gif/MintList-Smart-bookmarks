@@ -1,4 +1,7 @@
-const chromeApi = globalThis.chrome;
+// Chromium exposes a lightweight window.chrome object on normal web pages too.
+// Require the extension runtime ID so the GitHub Pages demo never attempts
+// extension-only sign-in or storage APIs.
+const chromeApi = globalThis.chrome?.runtime?.id ? globalThis.chrome : null;
 const storage = chromeApi?.storage?.local;
 const tabsApi = chromeApi?.tabs;
 const windowsApi = chromeApi?.windows;
@@ -10,6 +13,7 @@ const defaultState = {
     privacy: false,
     incognito: false,
     sidebarCollapsed: false,
+    themeMode: "wallpaper",
     wallpaper: "aurora-mint",
     wallpaperTone: "dark",
     uploadedWallpapers: []
@@ -90,6 +94,7 @@ const els = {
   pageList: document.getElementById("pageList"),
   addPageButton: document.getElementById("addPageButton"),
   pageTitle: document.getElementById("pageTitle"),
+  workspaceMeta: document.getElementById("workspaceMeta"),
   boards: document.getElementById("boards"),
   addBoardButton: document.getElementById("addBoardButton"),
   resetLayoutButton: document.getElementById("resetLayoutButton"),
@@ -114,10 +119,24 @@ const els = {
   linkTitleInput: document.getElementById("linkTitleInput"),
   linkUrlInput: document.getElementById("linkUrlInput"),
   paletteButton: document.getElementById("paletteButton"),
+  settingsButton: document.getElementById("settingsButton"),
   paletteDialog: document.getElementById("paletteDialog"),
   paletteInput: document.getElementById("paletteInput"),
   paletteResults: document.getElementById("paletteResults"),
   closePaletteButton: document.getElementById("closePaletteButton"),
+  settingsDialog: document.getElementById("settingsDialog"),
+  closeSettingsButton: document.getElementById("closeSettingsButton"),
+  settingsPrivacyToggle: document.getElementById("settingsPrivacyToggle"),
+  settingsIncognitoToggle: document.getElementById("settingsIncognitoToggle"),
+  settingsExportButton: document.getElementById("settingsExportButton"),
+  resetDataButton: document.getElementById("resetDataButton"),
+  extensionVersion: document.getElementById("extensionVersion"),
+  confirmDialog: document.getElementById("confirmDialog"),
+  confirmTitle: document.getElementById("confirmTitle"),
+  confirmMessage: document.getElementById("confirmMessage"),
+  confirmCancelButton: document.getElementById("confirmCancelButton"),
+  confirmActionButton: document.getElementById("confirmActionButton"),
+  toastRegion: document.getElementById("toastRegion"),
   boardTemplate: document.getElementById("boardTemplate"),
   linkTemplate: document.getElementById("linkTemplate")
 };
@@ -158,18 +177,31 @@ function normalizeState() {
   if (!wallpapers.some((wallpaper) => wallpaper.id === state.settings.wallpaper) && !state.settings.uploadedWallpapers.some((wallpaper) => wallpaper.id === state.settings.wallpaper)) {
     state.settings.wallpaper = defaultState.settings.wallpaper;
   }
-  if (!state.pages?.length) {
+  if (!Array.isArray(state.pages) || !state.pages.length) {
     state.pages = structuredClone(defaultState.pages);
     state.activePageId = defaultState.activePageId;
   }
-  state.pages.forEach((page) => {
+  state.pages = state.pages.filter((page) => page && typeof page === "object").map((page, pageIndex) => {
+    page.id ||= uid("page");
+    page.name = String(page.name || `Page ${pageIndex + 1}`).slice(0, 60);
+    page.boards = Array.isArray(page.boards) ? page.boards.filter((board) => board && typeof board === "object") : [];
     page.boards.forEach((board, index) => {
+      board.id ||= uid("board");
+      board.title = String(board.title || "Untitled board").slice(0, 80);
+      board.links = Array.isArray(board.links) ? board.links.filter((link) => link && typeof link.url === "string").map((link) => ({
+        id: link.id || uid("link"),
+        title: String(link.title || hostLabel(link.url)).slice(0, 120),
+        url: normalizeUrl(link.url)
+      })) : [];
       if (typeof board.x !== "number" || typeof board.y !== "number") {
         board.x = 24 + (index % 4) * 300;
         board.y = 24 + Math.floor(index / 4) * 240;
       }
     });
+    return page;
   });
+  if (!state.pages.length) state.pages = structuredClone(defaultState.pages);
+  if (!state.pages.some((page) => page.id === state.activePageId)) state.activePageId = state.pages[0].id;
 }
 
 function activePage() {
@@ -236,12 +268,17 @@ function applyFavicon(faviconEl, title, url) {
 
 function render() {
   applyWallpaper();
+  renderMintIcons();
   renderAccount();
   renderPages();
   renderBoards();
   renderSidebarToggle();
   els.privacyToggle.checked = state.settings.privacy;
   els.incognitoToggle.checked = state.settings.incognito;
+  els.settingsPrivacyToggle.checked = state.settings.privacy;
+  els.settingsIncognitoToggle.checked = state.settings.incognito;
+  document.querySelector(`input[name="themeMode"][value="${state.settings.themeMode}"]`)?.setAttribute("checked", "checked");
+  document.querySelectorAll('input[name="themeMode"]').forEach((input) => { input.checked = input.value === state.settings.themeMode; });
   els.body.classList.toggle("privacy-on", state.settings.privacy);
   maybeShowAuthDialog();
 }
@@ -249,7 +286,8 @@ function render() {
 function renderSidebarToggle() {
   const collapsed = state.settings.sidebarCollapsed;
   els.appShell.classList.toggle("sidebar-collapsed", collapsed);
-  els.sidebarToggleIcon.textContent = collapsed ? "\u203a" : "\u2039";
+  els.sidebarToggleIcon.dataset.icon = collapsed ? "chevronRight" : "chevronLeft";
+  renderMintIcons(els.sidebarToggleButton);
   const label = collapsed ? "Show sidebar" : "Hide sidebar";
   els.sidebarToggleButton.title = label;
   els.sidebarToggleButton.setAttribute("aria-label", label);
@@ -260,16 +298,18 @@ function applyWallpaper() {
   document.documentElement.style.setProperty("--wallpaper-a", current.a);
   document.documentElement.style.setProperty("--wallpaper-b", current.b);
   document.documentElement.style.setProperty("--wallpaper-c", current.c);
-  document.documentElement.style.setProperty("color-scheme", current.scheme);
-  document.documentElement.style.setProperty("--text", current.scheme === "light" ? "#1e2429" : "#f6f2e8");
-  document.documentElement.style.setProperty("--muted", current.scheme === "light" ? "#58636b" : "#b8bdc9");
-  document.documentElement.style.setProperty("--panel", current.scheme === "light" ? "rgba(255, 255, 255, 0.72)" : "rgba(20, 23, 31, 0.82)");
-  document.documentElement.style.setProperty("--panel-strong", current.scheme === "light" ? "rgba(255, 255, 255, 0.92)" : "rgba(28, 32, 42, 0.94)");
-  document.documentElement.style.setProperty("--line", current.scheme === "light" ? "rgba(30, 36, 41, 0.16)" : "rgba(255, 255, 255, 0.14)");
+  const mode = state.settings.themeMode || "wallpaper";
+  const scheme = mode === "system" ? (globalThis.matchMedia?.("(prefers-color-scheme: light)").matches ? "light" : "dark") : mode === "wallpaper" ? current.scheme : mode;
+  document.documentElement.style.setProperty("color-scheme", scheme);
+  document.documentElement.style.setProperty("--text", scheme === "light" ? "#1e2429" : "#f6f2e8");
+  document.documentElement.style.setProperty("--muted", scheme === "light" ? "#58636b" : "#b8bdc9");
+  document.documentElement.style.setProperty("--panel", scheme === "light" ? "rgba(255, 255, 255, 0.72)" : "rgba(20, 23, 31, 0.82)");
+  document.documentElement.style.setProperty("--panel-strong", scheme === "light" ? "rgba(255, 255, 255, 0.92)" : "rgba(28, 32, 42, 0.94)");
+  document.documentElement.style.setProperty("--line", scheme === "light" ? "rgba(30, 36, 41, 0.16)" : "rgba(255, 255, 255, 0.14)");
   try {
     localStorage.setItem(
       "mintlist-quick-theme",
-      JSON.stringify({ a: current.a, b: current.b, c: current.c, scheme: current.scheme })
+      JSON.stringify({ a: current.a, b: current.b, c: current.c, scheme })
     );
   } catch (error) {
     // Storage unavailable (e.g. private context) - the next load just skips the fast-paint step.
@@ -300,7 +340,7 @@ function renderAccount() {
 function maybeShowAuthDialog() {
   // Outside a real Chrome extension (e.g. this page running as a plain website/demo),
   // there's no Chrome Google profile to sign into, so don't gate the UI behind it.
-  if (!chromeApi) return;
+  if (!identityApi?.getProfileUserInfo) return;
   if (state.account.signedIn || els.authDialog.open) return;
   els.authStatus.textContent = "";
   els.authDialog.showModal();
@@ -310,6 +350,9 @@ function renderPages() {
   const page = activePage();
   els.pageList.replaceChildren();
   els.pageTitle.textContent = page.name;
+  const boardCount = page.boards.length;
+  const linkCount = page.boards.reduce((count, board) => count + board.links.length, 0);
+  els.workspaceMeta.textContent = `${boardCount} ${boardCount === 1 ? "board" : "boards"} · ${linkCount} ${linkCount === 1 ? "bookmark" : "bookmarks"}`;
 
   state.pages.forEach((item) => {
     const button = document.createElement("button");
@@ -329,7 +372,7 @@ function renderPages() {
     const renameButton = document.createElement("button");
     renameButton.className = "page-rename";
     renameButton.type = "button";
-    renameButton.textContent = "\u270e";
+    renameButton.innerHTML = '<span data-icon="edit" aria-hidden="true"></span>';
     renameButton.title = "Rename page";
     renameButton.setAttribute("aria-label", "Rename page");
     renameButton.addEventListener("click", async (event) => {
@@ -340,15 +383,17 @@ function renderPages() {
     const deleteButton = document.createElement("button");
     deleteButton.className = "page-delete";
     deleteButton.type = "button";
-    deleteButton.textContent = "x";
+    deleteButton.innerHTML = '<span data-icon="trash" aria-hidden="true"></span>';
     deleteButton.title = "Delete page";
     deleteButton.addEventListener("click", async (event) => {
       event.stopPropagation();
       if (state.pages.length === 1) return;
+      if (!await confirmAction("Delete page?", `“${item.name}” and its boards will be permanently removed.`, "Delete page")) return;
       state.pages = state.pages.filter((pageItem) => pageItem.id !== item.id);
-      state.activePageId = state.pages[0].id;
+      if (state.activePageId === item.id) state.activePageId = state.pages[0].id;
       await saveState();
       render();
+      showToast("Page deleted");
     });
 
     button.append(name, renameButton, deleteButton);
@@ -360,6 +405,7 @@ function renderPages() {
 
     els.pageList.append(button);
   });
+  renderMintIcons(els.pageList);
 }
 
 function renderBoards() {
@@ -369,8 +415,10 @@ function renderBoards() {
   if (!page.boards.length) {
     const empty = document.createElement("div");
     empty.className = "empty-state";
-    empty.textContent = "Create a board to start collecting links.";
+    empty.innerHTML = '<span class="empty-state-icon" data-icon="panel" aria-hidden="true"></span><div><strong>Your workspace is ready.</strong><p>Create a board to start collecting links.</p></div><button class="primary-button" type="button"><span data-icon="plus" aria-hidden="true"></span>Create board</button>';
+    empty.querySelector("button").addEventListener("click", () => els.addBoardButton.click());
     els.boards.append(empty);
+    renderMintIcons(empty);
     return;
   }
 
@@ -402,9 +450,11 @@ function renderBoards() {
 
     addLinkButton.addEventListener("click", () => openLinkDialog(board.id));
     deleteBoardButton.addEventListener("click", async () => {
+      if (!await confirmAction("Delete board?", `“${board.title}” and its ${board.links.length} bookmark${board.links.length === 1 ? "" : "s"} will be removed.`, "Delete board")) return;
       page.boards = page.boards.filter((item) => item.id !== board.id);
       await saveState();
       render();
+      showToast("Board deleted");
     });
 
     boardEl.addEventListener("dragstart", (event) => {
@@ -444,6 +494,7 @@ function renderBoards() {
     board.links.forEach((link) => list.append(renderLink(page, board, link)));
 
     els.boards.append(boardEl);
+    renderMintIcons(boardEl);
   });
 
   if (page.boards.length) {
@@ -505,9 +556,11 @@ function renderLink(page, board, link) {
   linkEl.querySelector(".link-delete").addEventListener("click", async (event) => {
     event.preventDefault();
     event.stopPropagation();
+    if (!await confirmAction("Remove bookmark?", `Remove “${link.title}” from “${board.title}”?`, "Remove bookmark")) return;
     board.links = board.links.filter((item) => item.id !== link.id);
     await saveState();
     render();
+    showToast("Bookmark removed");
   });
 
   return linkEl;
@@ -515,6 +568,28 @@ function renderLink(page, board, link) {
 
 function clearDragHighlights() {
   document.querySelectorAll(".drag-over").forEach((el) => el.classList.remove("drag-over"));
+}
+
+function showToast(message, tone = "success") {
+  const toast = document.createElement("div");
+  toast.className = `toast toast-${tone}`;
+  toast.innerHTML = `<span data-icon="${tone === "error" ? "close" : "check"}" aria-hidden="true"></span><span>${message}</span>`;
+  els.toastRegion.replaceChildren(toast);
+  renderMintIcons(toast);
+  window.setTimeout(() => toast.remove(), 3200);
+}
+
+function confirmAction(title, message, actionLabel) {
+  els.confirmTitle.textContent = title;
+  els.confirmMessage.textContent = message;
+  els.confirmActionButton.textContent = actionLabel;
+  els.confirmDialog.showModal();
+  return new Promise((resolve) => {
+    const onClose = () => resolve(els.confirmDialog.returnValue === "confirmed");
+    els.confirmDialog.addEventListener("close", onClose, { once: true });
+    els.confirmCancelButton.onclick = () => els.confirmDialog.close("cancelled");
+    els.confirmActionButton.onclick = () => els.confirmDialog.close("confirmed");
+  });
 }
 
 function moveLink(page, linkId, fromBoardId, toBoardId, targetLinkId = null) {
@@ -684,6 +759,25 @@ function openPalette() {
   els.paletteInput.focus();
 }
 
+function openSettings() {
+  els.settingsDialog.showModal();
+  els.closeSettingsButton.focus();
+}
+
+function exportBackup() {
+  const stamp = new Date().toISOString().slice(0, 10);
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `mintlist-backup-${stamp}.json`;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  showToast("Backup downloaded");
+}
+
 function renderPaletteResults(query) {
   const trimmed = query.trim().toLowerCase();
   const all = collectAllLinks();
@@ -800,6 +894,37 @@ function bindEvents() {
 
   els.paletteButton.addEventListener("click", openPalette);
 
+  els.settingsButton.addEventListener("click", openSettings);
+  els.closeSettingsButton.addEventListener("click", () => els.settingsDialog.close());
+  els.settingsPrivacyToggle.addEventListener("change", async () => {
+    state.settings.privacy = els.settingsPrivacyToggle.checked;
+    await saveState();
+    render();
+  });
+  els.settingsIncognitoToggle.addEventListener("change", async () => {
+    state.settings.incognito = els.settingsIncognitoToggle.checked;
+    await saveState();
+    render();
+  });
+  document.querySelectorAll('input[name="themeMode"]').forEach((input) => {
+    input.addEventListener("change", async () => {
+      state.settings.themeMode = input.value;
+      await saveState();
+      render();
+      showToast("Appearance updated");
+    });
+  });
+  els.settingsExportButton.addEventListener("click", exportBackup);
+  els.resetDataButton.addEventListener("click", async () => {
+    if (!await confirmAction("Reset MintList?", "This permanently removes all pages, bookmarks, preferences, and uploaded wallpapers on this device.", "Reset everything")) return;
+    state = structuredClone(defaultState);
+    await saveState();
+    els.settingsDialog.close();
+    renderWallpaperChoices();
+    render();
+    showToast("MintList was reset");
+  });
+
   els.closePaletteButton.addEventListener("click", () => els.paletteDialog.close());
 
   document.addEventListener("keydown", (event) => {
@@ -863,18 +988,7 @@ function bindEvents() {
     els.wallpaperUploadInput.value = "";
   });
 
-  els.exportDataButton.addEventListener("click", () => {
-    const stamp = new Date().toISOString().slice(0, 10);
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `mintlist-backup-${stamp}.json`;
-    document.body.append(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-  });
+  els.exportDataButton.addEventListener("click", exportBackup);
 
   els.importDataInput.addEventListener("change", async () => {
     const file = els.importDataInput.files?.[0];
@@ -882,15 +996,16 @@ function bindEvents() {
     try {
       const parsed = JSON.parse(await file.text());
       if (!parsed || !Array.isArray(parsed.pages)) throw new Error("Not a MintList backup");
-      const confirmed = window.confirm("Import this backup? It replaces all current pages, boards, and settings on this device.");
+      const confirmed = await confirmAction("Import backup?", "This replaces all current pages, boards, preferences, and uploaded wallpapers on this device.", "Import backup");
       if (!confirmed) return;
       state = parsed;
       normalizeState();
       await saveState();
       render();
       renderWallpaperChoices();
+      showToast("Backup restored");
     } catch (error) {
-      window.alert("That file doesn't look like a valid MintList backup.");
+      showToast("That file is not a valid MintList backup.", "error");
     } finally {
       els.importDataInput.value = "";
     }

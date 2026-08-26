@@ -11,7 +11,7 @@
     <main class="app-shell" id="appShell">
       <aside class="sidebar" id="sidebar">
         <button class="sidebar-toggle" id="sidebarToggleButton" type="button" title="Hide sidebar" aria-label="Hide sidebar">
-          <span id="sidebarToggleIcon" aria-hidden="true">&lsaquo;</span>
+          <span id="sidebarToggleIcon" data-icon="chevronLeft" aria-hidden="true"></span>
         </button>
 
         <div class="sidebar-content" id="sidebarContent">
@@ -36,7 +36,7 @@
         <nav class="page-list" id="pageList" aria-label="Bookmark pages"></nav>
 
         <button class="soft-button full-width" id="addPageButton" type="button">
-          <span aria-hidden="true">+</span>
+          <span data-icon="plus" aria-hidden="true"></span>
           New page
         </button>
 
@@ -72,7 +72,7 @@
         <section class="sidebar-section">
           <h2>Backup</h2>
           <button class="soft-button full-width" id="exportDataButton" type="button">
-            <span aria-hidden="true">&darr;</span>
+            <span data-icon="download" aria-hidden="true"></span>
             Export backup
           </button>
           <label class="soft-button upload-wallpaper">
@@ -86,12 +86,14 @@
       <section class="workspace">
         <header class="topbar">
           <div>
+            <p class="eyebrow" id="workspaceMeta">Your bookmark workspace</p>
             <h2 id="pageTitle">Bookmarks</h2>
           </div>
           <div class="topbar-actions">
-            <button class="icon-button" id="paletteButton" type="button" title="Search bookmarks (Ctrl/Cmd+K)" aria-label="Search bookmarks">🔍</button>
+            <button class="icon-button" id="paletteButton" type="button" title="Search bookmarks (Ctrl/Cmd+K)" aria-label="Search bookmarks"><span data-icon="search" aria-hidden="true"></span></button>
+            <button class="icon-button" id="settingsButton" type="button" title="Open settings" aria-label="Open settings"><span data-icon="settings" aria-hidden="true"></span></button>
             <button class="primary-button glass-accent" id="addBoardButton" type="button">
-              <span aria-hidden="true">+</span>
+              <span data-icon="plus" aria-hidden="true"></span>
               Board
             </button>
           </div>
@@ -117,7 +119,7 @@
       <form method="dialog" id="linkForm">
         <header class="modal-header">
           <h2 id="linkDialogTitle">Add link</h2>
-          <button class="ghost-button close-link-dialog" value="cancel" formnovalidate type="button" aria-label="Close">x</button>
+          <button class="ghost-button close-link-dialog" value="cancel" formnovalidate type="button" aria-label="Close"><span data-icon="close" aria-hidden="true"></span></button>
         </header>
         <label>
           Title
@@ -138,7 +140,7 @@
       <div class="palette-body">
         <header class="modal-header">
           <h2>Search bookmarks</h2>
-          <button class="ghost-button" id="closePaletteButton" type="button" aria-label="Close">x</button>
+          <button class="ghost-button" id="closePaletteButton" type="button" aria-label="Close"><span data-icon="close" aria-hidden="true"></span></button>
         </header>
         <input id="paletteInput" class="palette-input" type="text" placeholder="Search titles or URLs..." autocomplete="off">
         <div class="palette-results" id="paletteResults"></div>
@@ -151,9 +153,9 @@
         <header class="board-header">
           <input class="board-title-input" aria-label="Board title">
           <div class="board-actions">
-            <button class="mini-button open-board" type="button" title="Open all links">&nearr;</button>
-            <button class="mini-button add-link" type="button" title="Add link">+</button>
-            <button class="mini-button delete-board" type="button" title="Delete board">x</button>
+            <button class="mini-button open-board" type="button" title="Open all links" aria-label="Open all links"><span data-icon="external" aria-hidden="true"></span></button>
+            <button class="mini-button add-link" type="button" title="Add link" aria-label="Add link"><span data-icon="plus" aria-hidden="true"></span></button>
+            <button class="mini-button delete-board" type="button" title="Delete board" aria-label="Delete board"><span data-icon="trash" aria-hidden="true"></span></button>
           </div>
         </header>
         <div class="link-list"></div>
@@ -167,10 +169,50 @@
           <strong></strong>
           <small></small>
         </span>
-        <button class="link-delete" type="button" title="Delete link" aria-label="Delete link">x</button>
+        <button class="link-delete" type="button" title="Delete link" aria-label="Delete link"><span data-icon="trash" aria-hidden="true"></span></button>
       </a>
     </template>
 
+    <dialog class="modal settings-modal" id="settingsDialog" aria-labelledby="settingsTitle">
+      <div class="settings-body">
+        <header class="modal-header">
+          <div><p class="eyebrow">Preferences</p><h2 id="settingsTitle">Settings</h2></div>
+          <button class="ghost-button" id="closeSettingsButton" type="button" aria-label="Close settings"><span data-icon="close" aria-hidden="true"></span></button>
+        </header>
+        <section class="settings-section">
+          <h3>Appearance</h3>
+          <p>Choose how MintList’s controls adapt to your selected wallpaper.</p>
+          <div class="theme-options" role="radiogroup" aria-label="Color theme">
+            <label><input type="radio" name="themeMode" value="wallpaper"> Wallpaper</label>
+            <label><input type="radio" name="themeMode" value="system"> System</label>
+            <label><input type="radio" name="themeMode" value="dark"> Dark</label>
+            <label><input type="radio" name="themeMode" value="light"> Light</label>
+          </div>
+        </section>
+        <section class="settings-section">
+          <h3>Behavior</h3>
+          <label class="toggle-row"><input id="settingsPrivacyToggle" type="checkbox"><span>Blur bookmark addresses until hover</span></label>
+          <label class="toggle-row"><input id="settingsIncognitoToggle" type="checkbox"><span>Open bookmarks in an incognito window</span></label>
+        </section>
+        <section class="settings-section">
+          <h3>Data</h3>
+          <p>Backups contain your pages, boards, links, preferences, and uploaded wallpapers. MintList stores this information locally in Chrome.</p>
+          <div class="settings-actions"><button class="soft-button" id="settingsExportButton" type="button"><span data-icon="download" aria-hidden="true"></span> Export backup</button><button class="danger-button" id="resetDataButton" type="button"><span data-icon="trash" aria-hidden="true"></span> Reset data</button></div>
+        </section>
+        <section class="settings-section shortcut-list">
+          <h3>Shortcuts &amp; help</h3>
+          <p><kbd>Ctrl</kbd> / <kbd>⌘</kbd> + <kbd>K</kbd> opens search. Use <kbd>↑</kbd> and <kbd>↓</kbd> to choose a result, then <kbd>Enter</kbd> to open it. Double-click a bookmark to edit it.</p>
+        </section>
+        <section class="settings-section about-copy"><h3>About MintList</h3><p>Smart bookmarks, locally yours. Version <span id="extensionVersion">1.4.0</span>.</p></section>
+      </div>
+    </dialog>
+
+    <dialog class="modal confirm-modal" id="confirmDialog" aria-labelledby="confirmTitle">
+      <div class="confirm-body"><span class="confirm-icon" data-icon="trash" aria-hidden="true"></span><h2 id="confirmTitle">Remove item?</h2><p id="confirmMessage">This action cannot be undone.</p><div class="modal-actions"><button class="soft-button" id="confirmCancelButton" type="button">Cancel</button><button class="danger-button" id="confirmActionButton" type="button">Remove</button></div></div>
+    </dialog>
+    <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="icons.js"></script>
     <script src="newtab.js"></script>
   </body>
 </html>
