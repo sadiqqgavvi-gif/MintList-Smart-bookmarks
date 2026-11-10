@@ -1,26 +1,46 @@
 {
   "manifest_version": 3,
-  "name": "MintList New Tab",
-  "description": "A private, polished new-tab bookmark workspace with freeform boards, search, wallpapers, backups, and privacy controls.",
-  "version": "1.4.0",
-  "permissions": ["storage", "tabs", "identity", "identity.email", "unlimitedStorage", "favicon"],
+  "name": "MintList – Smart Bookmarks & New Tab",
+  "short_name": "MintList",
+  "description": "A beautiful new-tab bookmark manager: pages & boards, drag and drop, smart search, one-click save, Chrome bookmarks import and sync.",
+  "version": "2.0.0",
+  "minimum_chrome_version": "116",
+  "permissions": ["storage", "unlimitedStorage", "tabs", "contextMenus", "favicon"],
+  "optional_permissions": ["bookmarks"],
+  "background": {
+    "service_worker": "js/background.js"
+  },
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
-  "incognito": "split",
-  "icons": {
-    "16": "icons/icon16.png",
-    "32": "icons/icon32.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
-  },
+  "options_page": "options.html",
   "action": {
-    "default_title": "MintList",
+    "default_title": "Save to MintList",
+    "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
     }
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": { "default": "Alt+Shift+M" },
+      "description": "Open the MintList save popup"
+    },
+    "quick-save": {
+      "suggested_key": { "default": "Ctrl+Shift+Y", "mac": "Command+Shift+Y" },
+      "description": "Quick-save the current tab to MintList"
+    },
+    "save-all-tabs": {
+      "description": "Save every tab in the window as a MintList board"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   }
 }

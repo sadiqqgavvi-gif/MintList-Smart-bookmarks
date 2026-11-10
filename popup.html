@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <title>Save to MintList</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/popup.css">
+  </head>
+  <body class="popup">
+    <header class="pp-head">
+      <img src="icons/icon32.png" alt="" width="22" height="22">
+      <strong>MintList</strong>
+      <span class="pp-spacer"></span>
+      <button class="icon-btn sm" id="ppSearch" type="button" title="Search MintList" aria-label="Search MintList"><span data-icon="search"></span></button>
+      <button class="icon-btn sm" id="ppOpen" type="button" title="Open MintList" aria-label="Open MintList"><span data-icon="external"></span></button>
+    </header>
+
+    <form class="pp-form" id="ppForm" novalidate>
+      <section class="pp-page">
+        <span class="favicon" id="ppFavicon"></span>
+        <div class="pp-page-text">
+          <input class="pp-title" id="ppTitle" type="text" maxlength="200" aria-label="Bookmark title" autocomplete="off">
+          <span class="pp-url" id="ppUrl"></span>
+        </div>
+      </section>
+
+      <p class="pp-notice" id="ppNotice" hidden></p>
+
+      <label class="field">
+        <span class="field-label">Save to</span>
+        <select class="input" id="ppBoard"></select>
+      </label>
+      <label class="field" id="ppNewBoardField" hidden>
+        <span class="field-label">New board name</span>
+        <input class="input" id="ppNewBoard" type="text" maxlength="80" placeholder="e.g. Research" autocomplete="off">
+      </label>
+
+      <details class="pp-more" id="ppMore">
+        <summary><span data-icon="tag"></span>Tags, note &amp; star</summary>
+        <div class="pp-more-body">
+          <input class="input" id="ppTags" type="text" placeholder="Tags, comma separated" autocomplete="off">
+          <textarea class="input" id="ppNote" rows="2" maxlength="600" placeholder="Note (optional)"></textarea>
+          <label class="switch-row"><span><strong>Star this link</strong></span><input class="switch" id="ppStar" type="checkbox"></label>
+        </div>
+      </details>
+
+      <button class="btn btn-primary pp-save" id="ppSave" type="submit"><span data-icon="bookmarkPlus"></span><span id="ppSaveLabel">Save bookmark</span></button>
+      <button class="btn btn-secondary pp-save-all" id="ppSaveAll" type="button"><span data-icon="layers"></span><span id="ppSaveAllLabel">Save all tabs as a board</span></button>
+    </form>
+
+    <section class="pp-done" id="ppDone" hidden>
+      <span class="pp-done-icon" data-icon="check"></span>
+      <h2 id="ppDoneTitle">Saved!</h2>
+      <p id="ppDoneText"></p>
+      <div class="pp-done-actions">
+        <button class="btn btn-secondary sm" id="ppUndo" type="button"><span data-icon="undo"></span>Undo</button>
+        <button class="btn btn-primary sm" id="ppView" type="button"><span data-icon="external"></span>Open MintList</button>
+      </div>
+    </section>
+
+    <footer class="pp-foot">
+      <span><kbd class="kbd-mod">Ctrl Shift Y</kbd> saves instantly</span>
+      <button class="text-link" id="ppShortcuts" type="button">Change</button>
+    </footer>
+
+    <script src="js/icons.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/popup.js"></script>
+  </body>
+</html>
