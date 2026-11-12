@@ -1,22 +1,29 @@
-MintList New Tab - Chrome upload steps
+MintList 2.0.0 - Chrome Web Store upload steps
 
-Use the ZIP named MintList-New-Tab-Chrome-Upload-1.4.0.zip.
+Build the ZIP (run inside the project folder):
+  zip -r MintList-2.0.0.zip manifest.json index.html popup.html options.html css js icons
 
 Chrome Web Store:
 1. Open the Chrome Web Store Developer Dashboard.
-2. Click New Item.
-3. Upload MintList-New-Tab-Chrome-Upload-1.4.0.zip.
-4. Fill listing details, screenshots, privacy practices, and permission justifications.
+2. Click New Item (or open the existing listing and upload a new package).
+3. Upload MintList-2.0.0.zip.
+4. Fill in listing details, screenshots (1280x800), privacy practices and permission justifications (below).
 5. Submit for review.
 
 Local testing:
-1. Open chrome://extensions.
-2. Enable Developer mode.
-3. Click Load unpacked.
-4. Select the unzipped MintList-New-Tab-Chrome-Upload-1.4.0 folder.
+1. Open chrome://extensions and enable Developer mode.
+2. Click Load unpacked and select the project folder.
+3. Open a new tab.
 
-Permission notes:
-- bookmarks: imports Chrome bookmarks.
-- storage and unlimitedStorage: saves pages, boards, settings, and uploaded wallpapers locally.
-- tabs: opens links and settings pages.
-- identity and identity.email: reads the signed-in Chrome profile email for the Google profile prompt.
+Single purpose:
+  MintList replaces the new tab page with a bookmark manager and lets users save pages to it.
+
+Permission justifications:
+- storage, unlimitedStorage: stores the user's pages, boards, links, settings and uploaded wallpaper images locally.
+- tabs: reads the active tab's title and URL when the user saves it, lists open tabs in the "Open tabs" panel, and opens bookmarks in new tabs/windows.
+- contextMenus: adds "Save to MintList" to the right-click menu.
+- favicon: shows website icons from Chrome's local favicon cache next to each bookmark.
+- bookmarks (optional permission): requested only when the user chooses "Import Chrome bookmarks"; used once to read the bookmark tree.
+
+Data usage:
+  No data leaves the browser. Optional sync uses chrome.storage.sync (the user's own Chrome profile). No remote code, no analytics.

@@ -1,218 +1,629 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MintList</title>
     <link rel="icon" type="image/png" href="icons/icon32.png">
-    <link rel="stylesheet" href="styles.css">
+    <script src="js/quick-theme.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
   </head>
   <body>
-    <main class="app-shell" id="appShell">
-      <aside class="sidebar" id="sidebar">
-        <button class="sidebar-toggle" id="sidebarToggleButton" type="button" title="Hide sidebar" aria-label="Hide sidebar">
-          <span id="sidebarToggleIcon" data-icon="chevronLeft" aria-hidden="true"></span>
-        </button>
+    <div class="wallpaper" id="wallpaper" aria-hidden="true"></div>
+    <div class="wallpaper-shade" aria-hidden="true"></div>
 
-        <div class="sidebar-content" id="sidebarContent">
-        <div class="brand-row">
-          <div class="brand-mark">
-            <img src="icons/icon128.png" alt="MintList">
+    <div class="app" id="app">
+      <!-- ============================== Sidebar ============================== -->
+      <aside class="sidebar" id="sidebar" aria-label="Navigation">
+        <div class="sidebar-head">
+          <div class="brand">
+            <span class="brand-mark"><img src="icons/icon48.png" alt=""></span>
+            <span class="brand-name">MintList</span>
           </div>
-          <div>
-            <h1>MintList</h1>
-            <p>Smart bookmarks, locally yours.</p>
-          </div>
+          <button class="icon-btn sm" id="collapseSidebarButton" type="button" title="Hide sidebar  [" aria-label="Hide sidebar"><span data-icon="sidebar"></span></button>
         </div>
 
-        <section class="account-panel" id="accountPanel">
-          <div>
-            <strong id="accountName">Not signed in</strong>
-            <span id="accountEmail">Google profile required</span>
-          </div>
-          <button class="soft-button" id="signOutButton" type="button">Sign out</button>
-        </section>
-
-        <nav class="page-list" id="pageList" aria-label="Bookmark pages"></nav>
-
-        <button class="soft-button full-width" id="addPageButton" type="button">
-          <span data-icon="plus" aria-hidden="true"></span>
-          New page
+        <button class="search-trigger" id="searchTrigger" type="button">
+          <span data-icon="search"></span>
+          <span class="search-trigger-label">Search everything</span>
+          <kbd class="kbd-mod">Ctrl K</kbd>
         </button>
 
-        <button class="soft-button full-width" id="resetLayoutButton" type="button" title="Arrange boards into a tidy grid">
-          Reset layout
-        </button>
+        <div class="sidebar-scroll">
+          <section class="nav-group">
+            <div class="nav-group-head">
+              <span>Pages</span>
+              <button class="icon-btn xs" id="addPageButton" type="button" title="New page" aria-label="New page"><span data-icon="plus"></span></button>
+            </div>
+            <ul class="nav-list" id="pageList"></ul>
+          </section>
 
-        <section class="sidebar-section">
-          <h2>Wallpaper</h2>
-          <div class="segmented-control" aria-label="Wallpaper collection">
-            <button class="segment active" id="darkWallpapersButton" type="button">Dark</button>
-            <button class="segment" id="lightWallpapersButton" type="button">Light</button>
-          </div>
-          <div class="wallpaper-grid" id="wallpaperGrid" aria-label="Wallpaper selection"></div>
-          <label class="soft-button upload-wallpaper">
-            Upload wallpaper
-            <input id="wallpaperUploadInput" type="file" accept="image/*">
-          </label>
-        </section>
+          <section class="nav-group">
+            <div class="nav-group-head"><span>Library</span></div>
+            <ul class="nav-list" id="libraryList"></ul>
+          </section>
 
-        <section class="sidebar-section">
-          <h2>Mode</h2>
-          <label class="toggle-row">
-            <input id="privacyToggle" type="checkbox">
-            <span>Privacy blur</span>
-          </label>
-          <label class="toggle-row">
-            <input id="incognitoToggle" type="checkbox">
-            <span>Open incognito</span>
-          </label>
-        </section>
+          <section class="nav-group" id="tagGroup">
+            <div class="nav-group-head"><span>Tags</span></div>
+            <div class="tag-cloud" id="tagList"></div>
+          </section>
+        </div>
 
-        <section class="sidebar-section">
-          <h2>Backup</h2>
-          <button class="soft-button full-width" id="exportDataButton" type="button">
-            <span data-icon="download" aria-hidden="true"></span>
-            Export backup
-          </button>
-          <label class="soft-button upload-wallpaper">
-            Import backup
-            <input id="importDataInput" type="file" accept="application/json">
-          </label>
-        </section>
+        <div class="sidebar-foot">
+          <button class="nav-item" id="importButton" type="button"><span class="nav-icon" data-icon="download"></span><span class="nav-label">Import bookmarks</span></button>
+          <button class="nav-item" id="openSettingsButton" type="button"><span class="nav-icon" data-icon="settings"></span><span class="nav-label">Settings</span><span class="sync-dot" id="syncDot" hidden></span></button>
         </div>
       </aside>
 
-      <section class="workspace">
+      <!-- ============================== Workspace ============================== -->
+      <main class="workspace" id="workspace">
         <header class="topbar">
-          <div>
-            <p class="eyebrow" id="workspaceMeta">Your bookmark workspace</p>
-            <h2 id="pageTitle">Bookmarks</h2>
+          <div class="heading">
+            <button class="icon-btn sm reveal-sidebar" id="expandSidebarButton" type="button" title="Show sidebar  [" aria-label="Show sidebar"><span data-icon="sidebar"></span></button>
+            <div class="heading-text">
+              <p class="greeting" id="greeting"></p>
+              <div class="title-row">
+                <button class="view-icon" id="viewIcon" type="button" title="Change icon"></button>
+                <h1 id="viewTitle"></h1>
+                <input class="title-input" id="viewTitleInput" maxlength="60" aria-label="Page name" hidden>
+              </div>
+              <p class="view-meta" id="viewMeta"></p>
+            </div>
           </div>
-          <div class="topbar-actions">
-            <button class="icon-button" id="paletteButton" type="button" title="Search bookmarks (Ctrl/Cmd+K)" aria-label="Search bookmarks"><span data-icon="search" aria-hidden="true"></span></button>
-            <button class="icon-button" id="settingsButton" type="button" title="Open settings" aria-label="Open settings"><span data-icon="settings" aria-hidden="true"></span></button>
-            <button class="primary-button glass-accent" id="addBoardButton" type="button">
-              <span data-icon="plus" aria-hidden="true"></span>
-              Board
-            </button>
+          <div class="toolbar">
+            <label class="filter-field" id="filterField">
+              <span data-icon="search"></span>
+              <input id="filterInput" type="search" placeholder="Filter this page" autocomplete="off" spellcheck="false">
+              <kbd>/</kbd>
+            </label>
+            <button class="icon-btn" id="selectModeButton" type="button" title="Select links  S" aria-label="Select links" aria-pressed="false"><span data-icon="checkSquare"></span></button>
+            <button class="icon-btn" id="tabsPanelButton" type="button" title="Open tabs  ]" aria-label="Open tabs" aria-pressed="false"><span data-icon="tabsPanel"></span></button>
+            <button class="btn btn-primary" id="addBoardButton" type="button"><span data-icon="plus"></span><span>New board</span></button>
           </div>
         </header>
+        <div class="content" id="content" aria-live="polite"></div>
+      </main>
 
-        <div class="boards" id="boards" aria-live="polite"></div>
-      </section>
-    </main>
+      <!-- ============================== Open tabs ============================== -->
+      <aside class="tabs-panel" id="tabsPanel" aria-label="Open tabs">
+        <header class="panel-head">
+          <div>
+            <h2>Open tabs</h2>
+            <p id="tabsCount">This window</p>
+          </div>
+          <div class="panel-actions">
+            <button class="btn btn-secondary sm" id="saveAllTabsButton" type="button" title="Save every tab in this window as a new board"><span data-icon="bookmarkPlus"></span><span>Save all</span></button>
+            <button class="icon-btn sm" id="closeTabsPanelButton" type="button" title="Close panel" aria-label="Close panel"><span data-icon="close"></span></button>
+          </div>
+        </header>
+        <p class="panel-hint"><span data-icon="move"></span>Drag a tab onto any board to save it.</p>
+        <ul class="tabs-list" id="tabsList"></ul>
+      </aside>
+    </div>
 
-    <dialog class="modal auth-modal" id="authDialog">
-      <form method="dialog" id="authForm" novalidate>
-        <div class="auth-mark">
-          <img src="icons/icon128.png" alt="MintList">
+    <!-- Bulk selection bar -->
+    <div class="bulk-bar" id="bulkBar" hidden>
+      <span class="bulk-count" id="bulkCount">0 selected</span>
+      <span class="bulk-divider"></span>
+      <button class="bulk-action" type="button" data-bulk="all"><span data-icon="checkSquare"></span>Select all</button>
+      <button class="bulk-action" type="button" data-bulk="open"><span data-icon="external"></span>Open</button>
+      <button class="bulk-action" type="button" data-bulk="star"><span data-icon="star"></span>Star</button>
+      <button class="bulk-action" type="button" data-bulk="tag"><span data-icon="tag"></span>Tag</button>
+      <button class="bulk-action" type="button" data-bulk="move"><span data-icon="folderInput"></span>Move</button>
+      <button class="bulk-action danger" type="button" data-bulk="delete"><span data-icon="trash"></span>Delete</button>
+      <span class="bulk-divider"></span>
+      <button class="bulk-action" type="button" data-bulk="done">Done</button>
+    </div>
+
+    <!-- ============================== Link dialog ============================== -->
+    <dialog class="modal" id="linkDialog" aria-labelledby="linkDialogTitle">
+      <form id="linkForm" method="dialog" novalidate>
+        <header class="modal-head">
+          <div>
+            <h2 id="linkDialogTitle">Add link</h2>
+            <p class="modal-sub" id="linkDialogSub">Save a page to one of your boards.</p>
+          </div>
+          <button class="icon-btn sm" type="button" data-close aria-label="Close"><span data-icon="close"></span></button>
+        </header>
+        <div class="modal-body">
+          <label class="field">
+            <span class="field-label">URL</span>
+            <input class="input" id="linkUrlInput" type="text" inputmode="url" placeholder="https://example.com" autocomplete="off" spellcheck="false" required>
+            <span class="field-error" id="linkUrlError"></span>
+          </label>
+          <label class="field">
+            <span class="field-label">Title</span>
+            <input class="input" id="linkTitleInput" type="text" placeholder="Leave empty to use the site name" autocomplete="off" maxlength="200">
+          </label>
+          <div class="field-row">
+            <label class="field">
+              <span class="field-label">Board</span>
+              <select class="input" id="linkBoardSelect"></select>
+            </label>
+            <label class="field">
+              <span class="field-label">Tags</span>
+              <input class="input" id="linkTagsInput" type="text" placeholder="work, reading" autocomplete="off" list="tagSuggestions">
+            </label>
+          </div>
+          <label class="field">
+            <span class="field-label">Note <span class="field-optional">optional</span></span>
+            <textarea class="input" id="linkNoteInput" rows="2" maxlength="600" placeholder="Why did you save this?"></textarea>
+          </label>
+          <label class="switch-row">
+            <span><strong>Star this link</strong><small>Starred links appear in the Starred view.</small></span>
+            <input class="switch" id="linkStarInput" type="checkbox">
+          </label>
         </div>
-        <h2>Sign in to MintList</h2>
-        <p>Use your Chrome Google profile to keep this new tab personal on this browser.</p>
-        <p class="status-text" id="authStatus" role="status"></p>
-        <button class="primary-button" id="googleSignInButton" type="button">Sign in with Google</button>
+        <footer class="modal-foot">
+          <button class="btn btn-ghost" type="button" data-close>Cancel</button>
+          <button class="btn btn-primary" id="saveLinkButton" type="submit">Save link</button>
+        </footer>
       </form>
     </dialog>
+    <datalist id="tagSuggestions"></datalist>
 
-    <dialog class="modal" id="linkDialog">
-      <form method="dialog" id="linkForm">
-        <header class="modal-header">
-          <h2 id="linkDialogTitle">Add link</h2>
-          <button class="ghost-button close-link-dialog" value="cancel" formnovalidate type="button" aria-label="Close"><span data-icon="close" aria-hidden="true"></span></button>
+    <!-- ============================== Page dialog ============================== -->
+    <dialog class="modal sm" id="pageDialog" aria-labelledby="pageDialogTitle">
+      <form id="pageForm" method="dialog">
+        <header class="modal-head">
+          <div><h2 id="pageDialogTitle">New page</h2><p class="modal-sub">Pages hold boards — one per project, role or topic.</p></div>
+          <button class="icon-btn sm" type="button" data-close aria-label="Close"><span data-icon="close"></span></button>
         </header>
-        <label>
-          Title
-          <input id="linkTitleInput" required autocomplete="off">
-        </label>
-        <label>
-          URL
-          <input id="linkUrlInput" required type="url" placeholder="https://example.com" autocomplete="off">
-        </label>
-        <footer class="modal-actions">
-          <button class="soft-button close-link-dialog" value="cancel" formnovalidate type="button">Cancel</button>
-          <button class="primary-button" id="saveLinkButton" value="default" type="submit">Save link</button>
+        <div class="modal-body">
+          <label class="field">
+            <span class="field-label">Name</span>
+            <input class="input" id="pageNameInput" type="text" maxlength="60" placeholder="e.g. Work, Study, Side project" autocomplete="off" required>
+          </label>
+          <div class="field">
+            <span class="field-label">Icon</span>
+            <div class="emoji-grid" id="pageIconGrid" role="radiogroup" aria-label="Page icon"></div>
+          </div>
+        </div>
+        <footer class="modal-foot">
+          <button class="btn btn-ghost" type="button" data-close>Cancel</button>
+          <button class="btn btn-primary" id="savePageButton" type="submit">Create page</button>
         </footer>
       </form>
     </dialog>
 
-    <dialog class="modal palette-modal" id="paletteDialog">
-      <div class="palette-body">
-        <header class="modal-header">
-          <h2>Search bookmarks</h2>
-          <button class="ghost-button" id="closePaletteButton" type="button" aria-label="Close"><span data-icon="close" aria-hidden="true"></span></button>
+    <!-- ============================== Move dialog ============================== -->
+    <dialog class="modal sm" id="moveDialog" aria-labelledby="moveDialogTitle">
+      <form id="moveForm" method="dialog">
+        <header class="modal-head">
+          <div><h2 id="moveDialogTitle">Move to…</h2><p class="modal-sub" id="moveDialogSub"></p></div>
+          <button class="icon-btn sm" type="button" data-close aria-label="Close"><span data-icon="close"></span></button>
         </header>
-        <input id="paletteInput" class="palette-input" type="text" placeholder="Search titles or URLs..." autocomplete="off">
-        <div class="palette-results" id="paletteResults"></div>
-        <p class="status-text palette-hint">&uarr;&darr; to navigate &bull; Enter to open &bull; Esc to close</p>
+        <div class="modal-body">
+          <label class="field">
+            <span class="field-label">Page</span>
+            <select class="input" id="movePageSelect"></select>
+          </label>
+          <label class="field" id="moveBoardField">
+            <span class="field-label">Board</span>
+            <select class="input" id="moveBoardSelect"></select>
+          </label>
+          <label class="switch-row" id="moveCopyRow">
+            <span><strong>Keep a copy here</strong><small>Duplicate instead of moving.</small></span>
+            <input class="switch" id="moveCopyInput" type="checkbox">
+          </label>
+        </div>
+        <footer class="modal-foot">
+          <button class="btn btn-ghost" type="button" data-close>Cancel</button>
+          <button class="btn btn-primary" id="moveConfirmButton" type="submit">Move</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <!-- ============================== Share dialog ============================== -->
+    <dialog class="modal" id="shareDialog" aria-labelledby="shareDialogTitle">
+      <div class="share-wrap">
+        <header class="modal-head">
+          <div><h2 id="shareDialogTitle">Share</h2><p class="modal-sub" id="shareDialogSub"></p></div>
+          <button class="icon-btn sm" type="button" data-close aria-label="Close"><span data-icon="close"></span></button>
+        </header>
+        <div class="modal-body">
+          <div class="share-grid">
+            <button class="share-option" type="button" data-share="code"><span data-icon="share"></span><strong>Copy share code</strong><small>Paste it into another MintList (Import → Paste).</small></button>
+            <button class="share-option" type="button" data-share="markdown"><span data-icon="fileCode"></span><strong>Copy as Markdown</strong><small>For Notion, GitHub, Slack or docs.</small></button>
+            <button class="share-option" type="button" data-share="text"><span data-icon="copy"></span><strong>Copy link list</strong><small>Plain titles and URLs, one per line.</small></button>
+            <button class="share-option" type="button" data-share="html"><span data-icon="globe"></span><strong>Download web page</strong><small>A tidy standalone page anyone can open.</small></button>
+            <button class="share-option" type="button" data-share="bookmarks"><span data-icon="bookmark"></span><strong>Browser bookmarks file</strong><small>Import into Chrome, Edge, Firefox or Safari.</small></button>
+            <button class="share-option" type="button" data-share="email"><span data-icon="external"></span><strong>Send by email</strong><small>Opens your mail app with the links.</small></button>
+          </div>
+          <label class="field">
+            <span class="field-label">Share code</span>
+            <textarea class="input mono" id="shareCodeOutput" rows="3" readonly></textarea>
+          </label>
+        </div>
       </div>
     </dialog>
 
-    <template id="boardTemplate">
-      <article class="board" draggable="true">
-        <header class="board-header">
-          <input class="board-title-input" aria-label="Board title">
-          <div class="board-actions">
-            <button class="mini-button open-board" type="button" title="Open all links" aria-label="Open all links"><span data-icon="external" aria-hidden="true"></span></button>
-            <button class="mini-button add-link" type="button" title="Add link" aria-label="Add link"><span data-icon="plus" aria-hidden="true"></span></button>
-            <button class="mini-button delete-board" type="button" title="Delete board" aria-label="Delete board"><span data-icon="trash" aria-hidden="true"></span></button>
-          </div>
+    <!-- ============================== Import dialog ============================== -->
+    <dialog class="modal lg" id="importDialog" aria-labelledby="importDialogTitle">
+      <div class="import-wrap">
+        <header class="modal-head">
+          <div><h2 id="importDialogTitle">Import bookmarks</h2><p class="modal-sub" id="importDialogSub">Bring your links in from Chrome, a file, or a share code.</p></div>
+          <button class="icon-btn sm" type="button" data-close aria-label="Close"><span data-icon="close"></span></button>
         </header>
-        <div class="link-list"></div>
-      </article>
-    </template>
 
-    <template id="linkTemplate">
-      <a class="bookmark-link" draggable="true" rel="noreferrer">
-        <span class="favicon"></span>
-        <span class="link-copy">
-          <strong></strong>
-          <small></small>
-        </span>
-        <button class="link-delete" type="button" title="Delete link" aria-label="Delete link"><span data-icon="trash" aria-hidden="true"></span></button>
-      </a>
-    </template>
-
-    <dialog class="modal settings-modal" id="settingsDialog" aria-labelledby="settingsTitle">
-      <div class="settings-body">
-        <header class="modal-header">
-          <div><p class="eyebrow">Preferences</p><h2 id="settingsTitle">Settings</h2></div>
-          <button class="ghost-button" id="closeSettingsButton" type="button" aria-label="Close settings"><span data-icon="close" aria-hidden="true"></span></button>
-        </header>
-        <section class="settings-section">
-          <h3>Appearance</h3>
-          <p>Choose how MintList’s controls adapt to your selected wallpaper.</p>
-          <div class="theme-options" role="radiogroup" aria-label="Color theme">
-            <label><input type="radio" name="themeMode" value="wallpaper"> Wallpaper</label>
-            <label><input type="radio" name="themeMode" value="system"> System</label>
-            <label><input type="radio" name="themeMode" value="dark"> Dark</label>
-            <label><input type="radio" name="themeMode" value="light"> Light</label>
+        <div class="modal-body" id="importStepSource">
+          <div class="source-grid">
+            <button class="source-card" type="button" id="importChromeButton">
+              <span class="source-icon" data-icon="bookmark"></span>
+              <strong>Chrome bookmarks</strong>
+              <small>Pick folders from your browser bookmarks. Each folder becomes a board.</small>
+            </button>
+            <label class="source-card" id="importFileCard">
+              <span class="source-icon" data-icon="upload"></span>
+              <strong>Upload a file</strong>
+              <small>Bookmarks HTML from any browser, a MintList backup (.json), or a text list.</small>
+              <input id="importFileInput" type="file" accept=".html,.htm,.json,.txt,.md,.csv,text/html,application/json,text/plain" hidden>
+            </label>
+            <button class="source-card" type="button" id="importPasteButton">
+              <span class="source-icon" data-icon="copy"></span>
+              <strong>Paste links or code</strong>
+              <small>A share code, Markdown, or one URL per line.</small>
+            </button>
           </div>
-        </section>
-        <section class="settings-section">
-          <h3>Behavior</h3>
-          <label class="toggle-row"><input id="settingsPrivacyToggle" type="checkbox"><span>Blur bookmark addresses until hover</span></label>
-          <label class="toggle-row"><input id="settingsIncognitoToggle" type="checkbox"><span>Open bookmarks in an incognito window</span></label>
-        </section>
-        <section class="settings-section">
-          <h3>Data</h3>
-          <p>Backups contain your pages, boards, links, preferences, and uploaded wallpapers. MintList stores this information locally in Chrome.</p>
-          <div class="settings-actions"><button class="soft-button" id="settingsExportButton" type="button"><span data-icon="download" aria-hidden="true"></span> Export backup</button><button class="danger-button" id="resetDataButton" type="button"><span data-icon="trash" aria-hidden="true"></span> Reset data</button></div>
-        </section>
-        <section class="settings-section shortcut-list">
-          <h3>Shortcuts &amp; help</h3>
-          <p><kbd>Ctrl</kbd> / <kbd>⌘</kbd> + <kbd>K</kbd> opens search. Use <kbd>↑</kbd> and <kbd>↓</kbd> to choose a result, then <kbd>Enter</kbd> to open it. Double-click a bookmark to edit it.</p>
-        </section>
-        <section class="settings-section about-copy"><h3>About MintList</h3><p>Smart bookmarks, locally yours. Version <span id="extensionVersion">1.4.0</span>.</p></section>
+          <div class="drop-zone" id="importDropZone"><span data-icon="download"></span>…or drop a bookmarks file here</div>
+        </div>
+
+        <div class="modal-body" id="importStepPaste" hidden>
+          <label class="field">
+            <span class="field-label">Paste here</span>
+            <textarea class="input mono" id="importPasteInput" rows="9" placeholder="MINTLIST1:…&#10;&#10;or&#10;# Design&#10;https://dribbble.com&#10;Mobbin | https://mobbin.com&#10;[Figma](https://figma.com)"></textarea>
+          </label>
+        </div>
+
+        <div class="modal-body" id="importStepReview" hidden>
+          <div class="import-summary" id="importSummary"></div>
+          <div class="import-tree" id="importTree"></div>
+          <div class="import-backup" id="importBackupOptions" hidden>
+            <label class="radio-card"><input type="radio" name="backupMode" value="merge" checked><span><strong>Add to my library</strong><small>Imports the backup's pages next to your current ones.</small></span></label>
+            <label class="radio-card"><input type="radio" name="backupMode" value="replace"><span><strong>Replace everything</strong><small>Restores the backup exactly. Your current pages move to Trash.</small></span></label>
+          </div>
+          <div class="field-row" id="importDestinationRow">
+            <label class="field">
+              <span class="field-label">Import into</span>
+              <select class="input" id="importDestination"></select>
+            </label>
+            <label class="field" id="importPageNameField">
+              <span class="field-label">New page name</span>
+              <input class="input" id="importPageName" type="text" maxlength="60">
+            </label>
+          </div>
+          <label class="check-row" id="importDedupeRow"><input type="checkbox" id="importDedupe" checked> Skip links that are already in MintList</label>
+        </div>
+
+        <footer class="modal-foot">
+          <button class="btn btn-ghost" type="button" id="importBackButton" hidden><span data-icon="chevronLeft"></span>Back</button>
+          <span class="foot-spacer"></span>
+          <button class="btn btn-ghost" type="button" data-close>Cancel</button>
+          <button class="btn btn-primary" type="button" id="importNextButton" hidden>Continue</button>
+        </footer>
       </div>
     </dialog>
 
-    <dialog class="modal confirm-modal" id="confirmDialog" aria-labelledby="confirmTitle">
-      <div class="confirm-body"><span class="confirm-icon" data-icon="trash" aria-hidden="true"></span><h2 id="confirmTitle">Remove item?</h2><p id="confirmMessage">This action cannot be undone.</p><div class="modal-actions"><button class="soft-button" id="confirmCancelButton" type="button">Cancel</button><button class="danger-button" id="confirmActionButton" type="button">Remove</button></div></div>
+    <!-- ============================== Duplicates dialog ============================== -->
+    <dialog class="modal lg" id="duplicatesDialog" aria-labelledby="duplicatesTitle">
+      <div class="dup-wrap">
+        <header class="modal-head">
+          <div><h2 id="duplicatesTitle">Duplicate links</h2><p class="modal-sub" id="duplicatesSub"></p></div>
+          <button class="icon-btn sm" type="button" data-close aria-label="Close"><span data-icon="close"></span></button>
+        </header>
+        <div class="modal-body dup-list" id="duplicatesList"></div>
+        <footer class="modal-foot">
+          <span class="foot-note">The first copy of each link is kept. Removed copies go to Trash.</span>
+          <span class="foot-spacer"></span>
+          <button class="btn btn-ghost" type="button" data-close>Close</button>
+          <button class="btn btn-primary" type="button" id="removeDuplicatesButton">Remove duplicates</button>
+        </footer>
+      </div>
     </dialog>
-    <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
 
-    <script src="icons.js"></script>
-    <script src="newtab.js"></script>
+    <!-- ============================== Settings ============================== -->
+    <dialog class="modal xl settings" id="settingsDialog" aria-labelledby="settingsTitle">
+      <div class="settings-shell">
+        <nav class="settings-nav" aria-label="Settings sections">
+          <h2 id="settingsTitle">Settings</h2>
+          <button class="settings-tab active" type="button" data-tab="general"><span data-icon="settings"></span>General</button>
+          <button class="settings-tab" type="button" data-tab="appearance"><span data-icon="palette"></span>Appearance</button>
+          <button class="settings-tab" type="button" data-tab="wallpaper"><span data-icon="image"></span>Wallpaper</button>
+          <button class="settings-tab" type="button" data-tab="data"><span data-icon="cloud"></span>Sync &amp; data</button>
+          <button class="settings-tab" type="button" data-tab="shortcuts"><span data-icon="keyboard"></span>Shortcuts</button>
+          <button class="settings-tab" type="button" data-tab="about"><span data-icon="info"></span>About</button>
+        </nav>
+
+        <div class="settings-main">
+          <button class="icon-btn sm settings-close" type="button" data-close aria-label="Close settings"><span data-icon="close"></span></button>
+
+          <!-- General -->
+          <section class="settings-panel" data-panel="general">
+            <h3>General</h3>
+            <div class="setting-card">
+              <label class="setting-row">
+                <span><strong>Your name</strong><small>Used in the greeting at the top of the page.</small></span>
+                <input class="input sm" id="settingName" type="text" maxlength="40" placeholder="Optional" autocomplete="off">
+              </label>
+              <label class="setting-row">
+                <span><strong>Greeting, date &amp; time</strong><small>Show a greeting and clock above the page title.</small></span>
+                <input class="switch" id="settingShowGreeting" type="checkbox">
+              </label>
+              <label class="setting-row">
+                <span><strong>Show link addresses</strong><small>Display the domain under each bookmark title.</small></span>
+                <input class="switch" id="settingShowUrls" type="checkbox">
+              </label>
+            </div>
+
+            <h4>Opening links</h4>
+            <div class="setting-card">
+              <div class="setting-row">
+                <span><strong>Open bookmarks in</strong><small>Ctrl/⌘-click or middle-click always opens a background tab.</small></span>
+                <div class="segmented" role="radiogroup" aria-label="Open bookmarks in">
+                  <label><input type="radio" name="openIn" value="new-tab"><span>New tab</span></label>
+                  <label><input type="radio" name="openIn" value="background"><span>Background</span></label>
+                  <label><input type="radio" name="openIn" value="same-tab"><span>Same tab</span></label>
+                </div>
+              </div>
+              <label class="setting-row">
+                <span><strong>Open in an incognito window</strong><small>Requires “Allow in Incognito” on chrome://extensions.</small></span>
+                <input class="switch" id="settingIncognito" type="checkbox">
+              </label>
+              <label class="setting-row">
+                <span><strong>Privacy blur</strong><small>Blur link addresses until you hover — handy when screen sharing.</small></span>
+                <input class="switch" id="settingPrivacy" type="checkbox">
+              </label>
+            </div>
+
+            <h4>Quick save</h4>
+            <div class="setting-card">
+              <label class="setting-row">
+                <span><strong>Quick save destination</strong><small><kbd class="kbd-mod">Ctrl Shift Y</kbd> and the right-click “Quick save” put links here.</small></span>
+                <select class="input sm" id="settingQuickSave"></select>
+              </label>
+            </div>
+          </section>
+
+          <!-- Appearance -->
+          <section class="settings-panel" data-panel="appearance" hidden>
+            <h3>Appearance</h3>
+            <h4>Theme</h4>
+            <div class="theme-cards" role="radiogroup" aria-label="Theme">
+              <label class="theme-card"><input type="radio" name="theme" value="wallpaper"><span class="theme-preview tp-wallpaper"></span><span>Match wallpaper</span></label>
+              <label class="theme-card"><input type="radio" name="theme" value="system"><span class="theme-preview tp-system"></span><span>System</span></label>
+              <label class="theme-card"><input type="radio" name="theme" value="dark"><span class="theme-preview tp-dark"></span><span>Dark</span></label>
+              <label class="theme-card"><input type="radio" name="theme" value="light"><span class="theme-preview tp-light"></span><span>Light</span></label>
+            </div>
+            <h4>Accent colour</h4>
+            <div class="accent-row" id="accentOptions" role="radiogroup" aria-label="Accent colour"></div>
+            <h4>Layout</h4>
+            <div class="setting-card">
+              <div class="setting-row">
+                <span><strong>Columns</strong><small>How many board columns to show. Auto fits your screen.</small></span>
+                <div class="segmented" role="radiogroup" aria-label="Columns">
+                  <label><input type="radio" name="columns" value="auto"><span>Auto</span></label>
+                  <label><input type="radio" name="columns" value="2"><span>2</span></label>
+                  <label><input type="radio" name="columns" value="3"><span>3</span></label>
+                  <label><input type="radio" name="columns" value="4"><span>4</span></label>
+                  <label><input type="radio" name="columns" value="5"><span>5</span></label>
+                  <label><input type="radio" name="columns" value="6"><span>6</span></label>
+                </div>
+              </div>
+              <div class="setting-row">
+                <span><strong>Density</strong><small>Compact fits more links on screen.</small></span>
+                <div class="segmented" role="radiogroup" aria-label="Density">
+                  <label><input type="radio" name="density" value="comfortable"><span>Comfortable</span></label>
+                  <label><input type="radio" name="density" value="compact"><span>Compact</span></label>
+                </div>
+              </div>
+              <label class="setting-row">
+                <span><strong>Glass effect</strong><small>Frosted, translucent panels over your wallpaper.</small></span>
+                <input class="switch" id="settingGlass" type="checkbox">
+              </label>
+            </div>
+          </section>
+
+          <!-- Wallpaper -->
+          <section class="settings-panel" data-panel="wallpaper" hidden>
+            <h3>Wallpaper</h3>
+            <div class="wallpaper-toolbar">
+              <div class="segmented" role="radiogroup" aria-label="Wallpaper collection">
+                <label><input type="radio" name="wallpaperTone" value="dark"><span>Dark</span></label>
+                <label><input type="radio" name="wallpaperTone" value="light"><span>Light</span></label>
+              </div>
+              <label class="btn btn-secondary sm">
+                <span data-icon="upload"></span><span>Upload image</span>
+                <input id="wallpaperUploadInput" type="file" accept="image/*" hidden>
+              </label>
+            </div>
+            <div class="wallpaper-grid" id="wallpaperGrid"></div>
+            <div class="setting-card">
+              <label class="setting-row">
+                <span><strong>Dim</strong><small>Darken or lighten the wallpaper for readability.</small></span>
+                <span class="range-wrap"><input class="range" id="settingDim" type="range" min="0" max="80" step="1"><output id="settingDimValue"></output></span>
+              </label>
+              <label class="setting-row">
+                <span><strong>Blur</strong><small>Soften busy photos.</small></span>
+                <span class="range-wrap"><input class="range" id="settingBlur" type="range" min="0" max="24" step="1"><output id="settingBlurValue"></output></span>
+              </label>
+            </div>
+          </section>
+
+          <!-- Sync & data -->
+          <section class="settings-panel" data-panel="data" hidden>
+            <h3>Sync &amp; data</h3>
+            <div class="setting-card sync-card">
+              <label class="setting-row">
+                <span><strong>Sync with your Chrome profile</strong><small id="syncDescription">Keep pages, boards and links in sync on every computer where you're signed into Chrome. No account or server needed.</small></span>
+                <input class="switch" id="settingSync" type="checkbox">
+              </label>
+              <div class="sync-status" id="syncStatus" hidden></div>
+            </div>
+
+            <h4>Import &amp; export</h4>
+            <div class="setting-card">
+              <div class="setting-row">
+                <span><strong>Import</strong><small>Chrome bookmarks, browser bookmark files, backups or link lists.</small></span>
+                <button class="btn btn-secondary sm" type="button" id="settingsImportButton"><span data-icon="download"></span>Import…</button>
+              </div>
+              <div class="setting-row">
+                <span><strong>Backup</strong><small>Everything — pages, links, settings and wallpapers — in one file.</small></span>
+                <button class="btn btn-secondary sm" type="button" id="exportJsonButton"><span data-icon="upload"></span>Export backup</button>
+              </div>
+              <div class="setting-row">
+                <span><strong>Export for other browsers</strong><small>A standard bookmarks file or Markdown.</small></span>
+                <span class="btn-group">
+                  <button class="btn btn-secondary sm" type="button" id="exportHtmlButton">HTML</button>
+                  <button class="btn btn-secondary sm" type="button" id="exportMarkdownButton">Markdown</button>
+                </span>
+              </div>
+            </div>
+
+            <h4>Clean up</h4>
+            <div class="setting-card">
+              <div class="setting-row">
+                <span><strong>Find duplicate links</strong><small id="duplicateHint">Spot the same page saved more than once.</small></span>
+                <button class="btn btn-secondary sm" type="button" id="findDuplicatesButton">Review</button>
+              </div>
+              <div class="setting-row">
+                <span><strong>Storage</strong><small id="storageUsage">Calculating…</small></span>
+              </div>
+            </div>
+
+            <h4 class="danger-title">Danger zone</h4>
+            <div class="setting-card danger-card">
+              <div class="setting-row">
+                <span><strong>Reset MintList</strong><small>Delete every page, link, setting and wallpaper on this device.</small></span>
+                <button class="btn btn-danger sm" type="button" id="resetDataButton">Reset…</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Shortcuts -->
+          <section class="settings-panel" data-panel="shortcuts" hidden>
+            <h3>Keyboard shortcuts</h3>
+            <div class="shortcut-table" id="shortcutTable"></div>
+            <p class="settings-note">Browser-wide shortcuts (quick save, open popup) can be changed on <button class="text-link" type="button" id="openShortcutSettings">chrome://extensions/shortcuts</button>.</p>
+          </section>
+
+          <!-- About -->
+          <section class="settings-panel" data-panel="about" hidden>
+            <div class="about-hero">
+              <img src="icons/icon128.png" alt="" width="64" height="64">
+              <div>
+                <h3>MintList</h3>
+                <p>Smart bookmarks, locally yours. Version <span id="extensionVersion">2.0.0</span></p>
+              </div>
+            </div>
+            <div class="setting-card">
+              <div class="about-point"><span data-icon="shield"></span><span><strong>Private by design.</strong> Your bookmarks live in your browser. MintList has no servers, analytics or ads.</span></div>
+              <div class="about-point"><span data-icon="cloud"></span><span><strong>Optional sync</strong> uses your own Chrome profile storage.</span></div>
+              <div class="about-point"><span data-icon="zap"></span><span><strong>Fast.</strong> No frameworks, no network calls — it opens instantly.</span></div>
+            </div>
+            <div class="settings-actions">
+              <button class="btn btn-secondary sm" type="button" id="showWelcomeButton"><span data-icon="sparkles"></span>Show welcome tour</button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- ============================== Search palette ============================== -->
+    <dialog class="palette" id="paletteDialog" aria-label="Search">
+      <div class="palette-search">
+        <span data-icon="search"></span>
+        <input id="paletteInput" type="text" placeholder="Search links, boards, pages, tags and tabs…" autocomplete="off" spellcheck="false" aria-controls="paletteResults">
+        <button class="chip-toggle" id="exactToggle" type="button" aria-pressed="false" title="Exact match  Alt+E">Exact</button>
+        <kbd>Esc</kbd>
+      </div>
+      <div class="palette-scopes" id="paletteScopes" role="tablist" aria-label="Search scope"></div>
+      <div class="palette-results" id="paletteResults" role="listbox"></div>
+      <footer class="palette-foot">
+        <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+        <span><kbd>↵</kbd> open</span>
+        <span><kbd class="kbd-mod">Ctrl ↵</kbd> background tab</span>
+        <span><kbd>Tab</kbd> next scope</span>
+        <span class="palette-foot-tip"><kbd>#</kbd> tags · <kbd>&gt;</kbd> commands</span>
+      </footer>
+    </dialog>
+
+    <!-- ============================== Confirm ============================== -->
+    <dialog class="modal sm confirm" id="confirmDialog" aria-labelledby="confirmTitle">
+      <div class="confirm-body">
+        <span class="confirm-icon" id="confirmIcon" data-icon="alert"></span>
+        <h2 id="confirmTitle">Are you sure?</h2>
+        <p id="confirmMessage"></p>
+      </div>
+      <footer class="modal-foot">
+        <button class="btn btn-ghost" type="button" id="confirmCancelButton">Cancel</button>
+        <button class="btn btn-secondary" type="button" id="confirmAltButton" hidden></button>
+        <button class="btn btn-danger" type="button" id="confirmOkButton">Confirm</button>
+      </footer>
+    </dialog>
+
+    <!-- ============================== Prompt ============================== -->
+    <dialog class="modal sm" id="promptDialog" aria-labelledby="promptTitle">
+      <form id="promptForm" method="dialog">
+        <header class="modal-head">
+          <div><h2 id="promptTitle">Enter a value</h2><p class="modal-sub" id="promptMessage"></p></div>
+          <button class="icon-btn sm" type="button" data-close aria-label="Close"><span data-icon="close"></span></button>
+        </header>
+        <div class="modal-body">
+          <input class="input" id="promptInput" type="text" autocomplete="off" list="tagSuggestions">
+        </div>
+        <footer class="modal-foot">
+          <button class="btn btn-ghost" type="button" data-close>Cancel</button>
+          <button class="btn btn-primary" id="promptOkButton" type="submit">Save</button>
+        </footer>
+      </form>
+    </dialog>
+
+    <!-- ============================== Welcome ============================== -->
+    <dialog class="modal lg welcome" id="welcomeDialog" aria-labelledby="welcomeTitle">
+      <div class="welcome-hero">
+        <img src="icons/icon128.png" alt="" width="72" height="72">
+        <h2 id="welcomeTitle">Welcome to MintList</h2>
+        <p>Your new tab, turned into a calm and organised home for every link you care about.</p>
+      </div>
+      <div class="welcome-sync" id="welcomeSync" hidden>
+        <span data-icon="cloud"></span>
+        <span><strong>We found MintList data synced to your Chrome profile.</strong><small id="welcomeSyncMeta"></small></span>
+        <button class="btn btn-primary sm" type="button" id="welcomeRestoreSync">Restore it</button>
+      </div>
+      <div class="welcome-options">
+        <button class="welcome-option" type="button" data-start="chrome">
+          <span class="welcome-option-icon" data-icon="bookmark"></span>
+          <strong>Import Chrome bookmarks</strong>
+          <small>Turn your existing folders into boards in a few clicks.</small>
+        </button>
+        <button class="welcome-option" type="button" data-start="sample">
+          <span class="welcome-option-icon" data-icon="layout"></span>
+          <strong>Start with examples</strong>
+          <small>A few ready-made boards you can edit or delete.</small>
+        </button>
+        <button class="welcome-option" type="button" data-start="empty">
+          <span class="welcome-option-icon" data-icon="sparkles"></span>
+          <strong>Start fresh</strong>
+          <small>An empty page with an Inbox board.</small>
+        </button>
+      </div>
+      <ul class="welcome-tips">
+        <li><kbd class="kbd-mod">Ctrl Shift Y</kbd> saves the current tab from anywhere</li>
+        <li><span>Right-click</span> any page or link → <em>Save to MintList</em></li>
+        <li><kbd class="kbd-mod">Ctrl K</kbd> searches everything</li>
+      </ul>
+    </dialog>
+
+    <div class="menu" id="menu" role="menu" hidden></div>
+    <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+    <script src="js/icons.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/palette.js"></script>
+    <script src="js/dialogs.js"></script>
+    <script src="js/importer.js"></script>
+    <script src="js/main.js"></script>
   </body>
 </html>
