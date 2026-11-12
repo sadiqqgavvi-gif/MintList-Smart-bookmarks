@@ -4,7 +4,7 @@ MintList turns Chrome's new tab into a calm, organised home for every link you c
 
 It's private by design: no account, no server, no analytics. Your library lives in your browser, with optional sync through your own Chrome profile.
 
-![MintList boards](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/02-boards.png)
+![MintList with a custom wallpaper](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/home-batman.webp)
 
 ## Features
 
@@ -46,13 +46,29 @@ It's private by design: no account, no server, no analytics. Your library lives 
 
 ## Screenshots
 
-| Smart search (Ctrl/⌘ K) | Board options |
-| --- | --- |
-| ![Search](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/03-search.png) | ![Board menu](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/04-board-menu.png) |
+### In daily use
 
-| Light theme | Settings & wallpapers |
+| Home page with a custom wallpaper | Empty page, ready for boards |
 | --- | --- |
-| ![Light theme](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/05-light.png) | ![Settings](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/06-settings.png) |
+| ![Home page](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/home-batman.webp) | ![Empty page](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/empty-page.webp) |
+
+| Settings — General | Settings — Appearance |
+| --- | --- |
+| ![General settings](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/settings-general.png) | ![Appearance settings](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/settings-appearance.png) |
+
+| Settings — Wallpaper (uploaded image + built-in gradients) |
+| --- |
+| ![Wallpaper settings](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/settings-wallpaper.png) |
+
+### Feature tour
+
+| Default boards | Smart search (Ctrl/⌘ K) |
+| --- | --- |
+| ![Boards](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/02-boards.png) | ![Search](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/03-search.png) |
+
+| Board options | Light theme |
+| --- | --- |
+| ![Board menu](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/04-board-menu.png) | ![Light theme](https://raw.githubusercontent.com/sadiqqgavvi-gif/MintList-Smart-bookmarks/main/screenshots/05-light.png) |
 
 | Welcome & onboarding | Starred view | Save popup |
 | --- | --- | --- |
